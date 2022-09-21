@@ -18,11 +18,11 @@ def map_file_and_label(file):
         parts = line.split('\t')
         filename = parts[0]
         label = parts[1].removesuffix('\n')
-        if parts[0] == 'filename': continue
+        if filename == 'filename': continue
         s = file_to_label.setdefault(filename, set())
         s.add(label)
         s = label_to_file.setdefault(label, set())
-        s.add(file)
+        s.add(filename)
     file.close()
     return file_to_label, label_to_file
 
