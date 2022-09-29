@@ -43,6 +43,13 @@ def dict_to_counter(d):
         c[k] = len(v)
     return c
 
+def make_counts_table(file, labels, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec, we_ec):
+    file = open(file, 'w')
+    file.write("class_id\ttrain_event_count\ttrain_file_count\teval_event_count\teval_file_count\tweak_train_balanced_count\tweak_train_unbalanced_count\tweak_eval_count\n")
+    for id_ in labels:
+        file.write(f"{id_}\t{st_ec[id_]}\t{st_ltf[id_]}\t{se_ec[id_]}\t{se_ltf[id_]}\t{wtb_ec[id_]}\t{wtu_ec[id_]}\t{we_ec[id_]}\n")
+    file.close()
+
 if __name__ == '__main__':
     l_path = os.path.join('src','class_labels.tsv')
     ase_path = os.path.join('src','audioset_strong_eval.tsv')
