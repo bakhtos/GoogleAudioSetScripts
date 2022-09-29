@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 
 def load_labels(file):
     file = open(file, 'r')
@@ -25,6 +26,23 @@ def map_file_and_label(file):
         s.add(filename)
     file.close()
     return file_to_label, label_to_file
+
+def count_events(file):
+    file = open(file, 'r')
+    event_counts = Counter()
+    for line in file:
+        parts = line.split('\t')
+        label = parts[1].removesuffix('\n')
+        event_counts[label] += 1
+    file.close()
+    return event_counts
+
+def dict_to_counter(d):
+    c = Counter()
+    for k, v in d.items():
+        c[k] = len(v)
+    c = c.most_common()
+    return c
 
 if __name__ == '__main__':
     labels = load_labels(os.path.join('src', 'class_labels.tsv'))
