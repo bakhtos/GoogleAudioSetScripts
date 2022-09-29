@@ -54,14 +54,25 @@ if __name__ == '__main__':
     l_path = os.path.join('src','class_labels.tsv')
     ase_path = os.path.join('src','audioset_strong_eval.tsv')
     ast_path = os.path.join('src','audioset_strong_train.tsv')
+    awtb_path = os.path.join('src','audioset_weak_train_balanced.tsv')
+    awtu_path = os.path.join('src','audioset_weak_train_unbalanced.tsv')
+    awe_path = os.path.join('src','audioset_weak_eval.tsv')
 
     labels = load_labels(l_path)
     se_ftl, se_ltf = map_file_and_label(ase_path)
     st_ftl, st_ltf = map_file_and_label(ast_path)
+    we_ftl, we_ltf = map_file_and_label(awe_path)
+    wtb_ftl, wtb_ltf = map_file_and_label(awtb_path)
+    wtu_ftl, wtu_ltf = map_file_and_label(awtu_path)
 
     st_ltf_counter = dict_to_counter(st_ltf)
     se_ltf_counter = dict_to_counter(se_ltf)
+    we_ec = dict_to_counter(we_ltf)
+    wtb_ec = dict_to_counter(wtb_ltf)
+    wtu_ec = dict_to_counter(wtu_ltf)
 
     se_ec = count_events(ase_path)
     st_ec = count_events(ast_path)
-    print(st_ec)
+
+    make_counts_table('table3.tsv', labels, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
+                      wtb_ec, wtu_ec, we_ec)
