@@ -41,7 +41,6 @@ def dict_to_counter(d):
     c = Counter()
     for k, v in d.items():
         c[k] = len(v)
-    c = c.most_common()
     return c
 
 if __name__ == '__main__':
