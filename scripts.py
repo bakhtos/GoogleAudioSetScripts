@@ -45,6 +45,17 @@ def dict_to_counter(d):
     return c
 
 if __name__ == '__main__':
-    labels = load_labels(os.path.join('src', 'class_labels.tsv'))
-    se_ftl, se_ltf = map_file_and_label(os.path.join('src', 'audioset_strong_eval.tsv'))
-    st_ftl, st_ltf = map_file_and_label(os.path.join('src', 'audioset_strong_train.tsv'))
+    l_path = os.path.join('src','class_labels.tsv')
+    ase_path = os.path.join('src','audioset_strong_eval.tsv')
+    ast_path = os.path.join('src','audioset_strong_train.tsv')
+
+    labels = load_labels(l_path)
+    se_ftl, se_ltf = map_file_and_label(ase_path)
+    st_ftl, st_ltf = map_file_and_label(ast_path)
+
+    st_ltf_counter = dict_to_counter(st_ltf)
+    se_ltf_counter = dict_to_counter(se_ltf)
+
+    se_ec = count_events(ase_path)
+    st_ec = count_events(ast_path)
+    print(st_ec)
