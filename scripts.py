@@ -81,6 +81,21 @@ def filter_by_file(filter_list, data_old, data_new, i):
             data_new.write(line)
     data_old.close()
     data_new.close()
+
+
+def select_files(data, output):
+    files = set()
+    file = open(data, 'r')
+    for line in file:
+        f = line.split('\t')[0]
+        if f == 'filename': continue
+        files.add(f)
+    output = open(output, 'w')
+    for f in files:
+        output.write(f"{f}\n")
+    file.close()
+    output.close()
+    return files
     
 
 if __name__ == '__main__':
