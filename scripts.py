@@ -50,6 +50,22 @@ def make_counts_table(file, labels, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec
         file.write(f"{id_}\t{st_ec[id_]}\t{st_ltf[id_]}\t{se_ec[id_]}\t{se_ltf[id_]}\t{wtb_ec[id_]}\t{wtu_ec[id_]}\t{we_ec[id_]}\n")
     file.close()
 
+def filter_by_file(file_list, data_old, data_new, i):
+    file_list = open(file_list, 'r')
+    files = set()
+    for line in file_list:
+        files.add(line[:-1])
+    file_list.close()
+    data_old = open(data_old, 'r')
+    data_new = open(data_new, 'w')
+    for line in data_old:
+        filename = line.split('\t')[i].removesuffix('\n')
+        if filename in files or filename == 'filename':
+            data_new.write(line)
+    data_old.close()
+    data_new.close()
+    
+
 if __name__ == '__main__':
     l_path = os.path.join('src','class_labels.tsv')
     ase_path = os.path.join('src','audioset_strong_eval.tsv')
