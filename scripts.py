@@ -101,18 +101,24 @@ if __name__ == '__main__':
     labels = load_labels(l_path)
     se_ftl, se_ltf = map_file_and_label(ase_path)
     st_ftl, st_ltf = map_file_and_label(ast_path)
+    setd_ftl, setd_ltf = map_file_and_label(asetd_path)
+    sttd_ftl, sttd_ltf = map_file_and_label(asttd_path)
     we_ftl, we_ltf = map_file_and_label(awe_path)
     wtb_ftl, wtb_ltf = map_file_and_label(awtb_path)
     wtu_ftl, wtu_ltf = map_file_and_label(awtu_path)
 
     st_ltf_counter = dict_to_counter(st_ltf)
     se_ltf_counter = dict_to_counter(se_ltf)
+    setd_ltf_counter = dict_to_counter(setd_ltf)
+    sttd_ltf_counter = dict_to_counter(sttd_ltf)
     we_ec = dict_to_counter(we_ltf)
     wtb_ec = dict_to_counter(wtb_ltf)
     wtu_ec = dict_to_counter(wtu_ltf)
 
     se_ec = count_events(ase_path)
     st_ec = count_events(ast_path)
+    setd_ec = count_events(asetd_path)
+    sttd_ec = count_events(asttd_path)
 
     top110 = st_ec.most_common(110)
     file = open('selected_classes.txt', 'w')
@@ -131,3 +137,5 @@ if __name__ == '__main__':
                       wtb_ec, wtu_ec, we_ec)
     make_top_counts_table('AudioSetTop110ClassesSortedCounts.tsv', 110, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
                       wtb_ec, wtu_ec, we_ec)
+    make_downloaded_counts_table('AudioSetDownloadedCounts.tsv', 110, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
+                                 sttd_ltf_counter, setd_ltf_counter, sttd_ec, setd_ec)
