@@ -58,6 +58,14 @@ def make_top_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_e
         file.write(f"{id_}\t{st_ec[id_]}\t{st_ltf[id_]}\t{se_ec[id_]}\t{se_ltf[id_]}\t{wtb_ec[id_]}\t{wtu_ec[id_]}\t{we_ec[id_]}\n")
     file.close()
 
+def make_downloaded_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, sttd_ltf, setd_ltf, sttd_ec, setd_ec):
+    file = open(file, 'w')
+    top_classes = st_ec.most_common(top)
+    file.write("class_id\ttrain_event_count\ttrain_event_count_downloaded\ttrain_file_count\ttrain_file_count_downloaded\teval_event_count\teval_event_count_downloaded\teval_file_count\teval_file_count_downloaded\n")
+    for id_, _ in top_classes:
+        file.write(f"{id_}\t{st_ec[id_]}\t{sttd_ec[id_]}\t{st_ltf[id_]}\t{sttd_ltf[id_]}\t{se_ec[id_]}\t{setd_ec[id_]}\t{se_ltf[id_]}\t{setd_ltf[id_]}\n")
+    file.close()
+
 def filter_by_file(filter_list, data_old, data_new, i):
     header_set = {'filename', 'event_label', 'onset', 'offset'}
     filter_list = open(filter_list, 'r')
