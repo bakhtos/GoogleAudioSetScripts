@@ -145,12 +145,8 @@ if __name__ == '__main__':
     setd_ec = count_events(asetd_path)
     sttd_ec = count_events(asttd_path)
 
-    top110 = st_ec.most_common(110)
-    file = open('selected_classes.txt', 'w')
-    for c in top110:
-        file.write(c[0]+'\n')
-    file.close()
-    
+    select_classes(st_ec, 110, 'selected_classes.txt')
+
     filter_by_file('selected_classes.txt', ast_path, astt_path, 1)
     filter_by_file('selected_classes.txt', ase_path, aset_path, 1)
     filter_by_file('train_list.txt', ast_path, astd_path, 0)
