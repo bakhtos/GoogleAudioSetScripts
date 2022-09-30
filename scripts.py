@@ -58,7 +58,7 @@ def make_top_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_e
         file.write(f"{id_}\t{st_ec[id_]}\t{st_ltf[id_]}\t{se_ec[id_]}\t{se_ltf[id_]}\t{wtb_ec[id_]}\t{wtu_ec[id_]}\t{we_ec[id_]}\n")
     file.close()
 
-def filter_by_file(file_list, data_old, data_new, i):
+def filter_by_file(filter_list, data_old, data_new, i):
     header_set = {'filename', 'event_label', 'onset', 'offset'}
     filter_list = open(filter_list, 'r')
     items = set()
