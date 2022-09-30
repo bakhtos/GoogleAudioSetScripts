@@ -78,10 +78,17 @@ def filter_by_file(filter_list, data_old, data_new, i):
 if __name__ == '__main__':
     l_path = os.path.join('src','class_labels.tsv')
     ase_path = os.path.join('src','audioset_strong_eval.tsv')
+    aset_path = 'audioset_strong_eval_top110classes.tsv'
+    asetd_path = 'audioset_strong_eval_top110classes_downloaded.tsv'
+    ased_path = 'audioset_strong_eval_downloaded.tsv'
     ast_path = os.path.join('src','audioset_strong_train.tsv')
+    astt_path = 'audioset_strong_train_top110classes.tsv'
+    asttd_path = 'audioset_strong_train_top110classes_downloaded.tsv'
+    astd_path = 'audioset_strong_train_downloaded.tsv'
     awtb_path = os.path.join('src','audioset_weak_train_balanced.tsv')
     awtu_path = os.path.join('src','audioset_weak_train_unbalanced.tsv')
     awe_path = os.path.join('src','audioset_weak_eval.tsv')
+    asetd_path = 'audioset_strong_eval_top110classes_downloaded.tsv'
 
     labels = load_labels(l_path)
     se_ftl, se_ltf = map_file_and_label(ase_path)
@@ -99,5 +106,20 @@ if __name__ == '__main__':
     se_ec = count_events(ase_path)
     st_ec = count_events(ast_path)
 
-    make_counts_table('table3.tsv', labels, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
+    top110 = st_ec.most_common(110)
+    file = open('selected_classes.txt', 'w')
+    for c in top110:
+        file.write(c[0]+'\n')
+    file.close()
+    
+    filter_by_file('selected_classes.txt', ast_path, astt_path, 1)
+    filter_by_file('selected_classes.txt', ase_path, aset_path, 1)
+    filter_by_file('train_list.txt', ast_path, astd_path, 0)
+    filter_by_file('eval_list.txt', ase_path, ased_path, 0)
+    filter_by_file('selected_classes.txt', astd_path, asttd_path, 1)
+    filter_by_file('selected_classes.txt', ased_path, asetd_path, 1)
+
+    make_counts_table('AudioSetClassCounts.tsv', labels, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
+                      wtb_ec, wtu_ec, we_ec)
+    make_top_counts_table('AudioSetTop110ClassesSortedCounts.tsv', 110, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
                       wtb_ec, wtu_ec, we_ec)
