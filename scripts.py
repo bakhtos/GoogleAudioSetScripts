@@ -51,16 +51,17 @@ def make_counts_table(file, labels, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec
     file.close()
 
 def filter_by_file(file_list, data_old, data_new, i):
-    file_list = open(file_list, 'r')
-    files = set()
-    for line in file_list:
-        files.add(line[:-1])
-    file_list.close()
+    header_set = {'filename', 'event_label', 'onset', 'offset'}
+    filter_list = open(filter_list, 'r')
+    items = set()
+    for line in filter_list:
+        items.add(line[:-1])
+    filter_list.close()
     data_old = open(data_old, 'r')
     data_new = open(data_new, 'w')
     for line in data_old:
-        filename = line.split('\t')[i].removesuffix('\n')
-        if filename in files or filename == 'filename':
+        item = line.split('\t')[i].removesuffix('\n')
+        if item in items or item in header_set:
             data_new.write(line)
     data_old.close()
     data_new.close()
