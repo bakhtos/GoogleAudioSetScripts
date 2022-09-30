@@ -148,6 +148,9 @@ if __name__ == '__main__':
     filter_by_file('selected_classes.txt', astd_path, asttd_path, 1)
     filter_by_file('selected_classes.txt', ased_path, asetd_path, 1)
 
+    select_files(astt_path, "selected_files_train.txt")
+    select_files(aset_path, 'selected_files_eval.txt')
+
     make_counts_table('AudioSetClassCounts.tsv', labels, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
                       wtb_ec, wtu_ec, we_ec)
     make_top_counts_table('AudioSetTop110ClassesSortedCounts.tsv', 110, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
