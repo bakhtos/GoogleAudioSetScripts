@@ -5,21 +5,6 @@ import sys
 import argparse
 from multiprocessing import Pool
 
-# Format audio - 16 bit Signed PCM audio sampled at 44.1kHz
-def format_audio(input_audio_file,output_audio_file):
-    temp_audio_file = output_audio_file[:-4] + '_temp.wav'
-    cmdstring = "ffmpeg -loglevel panic -i %s -ac 1 -ar 44100 %s" %(input_audio_file,temp_audio_file)
-    os.system(cmdstring)
-    cmdstring1 = "sox %s -G -b 16 -r 44100 %s" %(temp_audio_file,output_audio_file)
-    os.system(cmdstring1)
-    cmdstring2 = "rm -rf %s" %(temp_audio_file)
-    os.system(cmdstring2)
-
-# Trim audio based on start time and duration of audio.
-def trim_audio(input_audio_file,output_audio_file,start_time,duration):
-    cmdstring = "sox %s %s trim %s %s" %(input_audio_file,output_audio_file,start_time,duration)
-    os.system(cmdstring)
-
 #Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
 def download_audio(line, csv_file, clip_length=10000):
     line = line[:-1]
@@ -29,7 +14,7 @@ def download_audio(line, csv_file, clip_length=10000):
     clip_length = clip_length/1000
     end_seconds = start_seconds+int(clip_length)
     url = "https://www.youtube.com/watch?v=" + query_id
-    ex1 = ""
+
     try:
 
         output_folder = csv_file + "_downloaded" 
@@ -40,22 +25,23 @@ def download_audio(line, csv_file, clip_length=10000):
         path_to_formatted_audio = os.path.join(formatted_folder, query_id+".wav")
         path_to_segmented_audio = os.path.join(segmented_folder, line+".wav")
 
-        if not os.path.exists(path_to_download):
-            cmdstring = "yt-dlp -f 'ba' -x --audio-format wav " + url + " -o '" + path_to_download + "'"
-            os.system(cmdstring)
-            format_audio(path_to_download,path_to_formatted_audio)
-        else:
+        if os.path.exists(path_to_download):
             print("File {} already exists.".format(query_id))
+        else:
+            cmdstring = f"yt-dlp -f 'ba' -x --audio-format wav {url} -o '{path_to_download}'"
+            os.system(cmdstring)
+        
+        cmdstring = f"sox {path_to_download} -G -c 1 -b 16 -r 44100 f{path_to_formatted_audio}"
+        os.system(cmdstring)
 
         #Trimming
-        trim_audio(path_to_formatted_audio,path_to_segmented_audio,start_seconds,clip_length)
+        cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds) {clip_length}"
+        os.system(cmdstring)
 
     except Exception as ex:
         ex1 = str(ex) + ',' + str(query_id)
 
         print("Error is ---> " + str(ex))
-
-    return ex1
 
 
 #Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
