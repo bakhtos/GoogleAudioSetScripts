@@ -6,42 +6,49 @@ import argparse
 from multiprocessing import Pool
 
 #Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
-def download_audio(line, csv_file, clip_length=10000):
+def download_audio(line, dataset_name, clip_length=10000):
     line = line[:-1]
     parts = line.split('_')
     query_id = '_'.join(parts[:-1])
+
     start_seconds = int(parts[-1])//1000
     clip_length = clip_length/1000
     end_seconds = start_seconds+int(clip_length)
+
     url = "https://www.youtube.com/watch?v=" + query_id
 
+    download_folder = dataset_name + "_downloaded" 
+    formatted_folder = dataset_name + "_formatted"
+    segmented_folder = dataset_name + "_segmented"
+
+    path_to_download = os.path.join(download_folder, f"Y{query_id}.wav")
+    path_to_formatted_audio = os.path.join(formatted_folder, f"Y{query_id}.wav")
+    path_to_segmented_audio = os.path.join(segmented_folder, f"Y{line}.wav")
+
     try:
-
-        output_folder = csv_file + "_downloaded" 
-        formatted_folder = csv_file + "_formatted"
-        segmented_folder = csv_file + "_segmented"
-
-        path_to_download = os.path.join(output_folder, query_id+".wav")
-        path_to_formatted_audio = os.path.join(formatted_folder, query_id+".wav")
-        path_to_segmented_audio = os.path.join(segmented_folder, line+".wav")
-
+        print(f"{query_id}: Downloading...")
         if os.path.exists(path_to_download):
-            print("File {} already exists.".format(query_id))
+            print(f"{query_id}: Downloaded file already exists.")
         else:
             cmdstring = f"yt-dlp -f 'ba' -x --audio-format wav {url} -o '{path_to_download}'"
             os.system(cmdstring)
         
-        cmdstring = f"sox {path_to_download} -G -c 1 -b 16 -r 44100 f{path_to_formatted_audio}"
-        os.system(cmdstring)
+        print(f"{query_id}: Formatting...")
+        if os.path.exists(path_to_formatted_audio):
+            print(f"{query_id}: Formatted file already exists.")
+        else:
+            cmdstring = f"sox {path_to_download} -G -c 1 -b 16 -r 44100 f{path_to_formatted_audio}"
+            os.system(cmdstring)
 
-        #Trimming
-        cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds) {clip_length}"
-        os.system(cmdstring)
+        print(f"{query_id}: Trimming...")
+        if os.path.exists(path_to_segmented_audio):
+            print(f"{query_id}: Trimmed file already exists.")
+        else:
+            cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds} {clip_length}"
+            os.system(cmdstring)
 
     except Exception as ex:
-        ex1 = str(ex) + ',' + str(query_id)
-
-        print("Error is ---> " + str(ex))
+        print(f"{query_id}: Error - {str(ex)}")
 
 
 #Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
