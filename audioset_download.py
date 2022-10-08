@@ -5,7 +5,6 @@ import sys
 import argparse
 from multiprocessing import Pool
 
-#Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
 def download_audio(segment_id, dataset_name, clip_length=10000):
 
     parts = segment_id.split('_')
@@ -51,8 +50,6 @@ def download_audio(segment_id, dataset_name, clip_length=10000):
         print(f"{query_id}: Error - {str(ex)}")
 
 
-#Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
-#Multiprocessing module spawns 3 process in parallel which runs download_audio_method. Multiprocessing, thus allows downloading process to happen in 40 percent of the time approximately to downloading sequentially - processing line by line of input csv file. 
 def parallelize_download(input_file,num_workers=None, clip_length=10000):
     dataset_name = input_file.removesuffix('.txt')
     with open(input_file, 'r) as segments_info_file:
