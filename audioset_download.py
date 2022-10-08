@@ -69,11 +69,8 @@ def parallelize_download(csv_file,num_workers):
             if line is not None: lines_list.append((line, csv_file))
             last_loop = line is None
         
-        P = multiprocessing.Pool(num_workers)
-
-        exception = P.starmap(download_audio,lines_list)
-        P.close()
-        P.join()
+        with Pool(num_workers) as P:
+            P.starmap(download_audio,lines_list)
         if last_loop: break
     segments_info_file.close()
 
