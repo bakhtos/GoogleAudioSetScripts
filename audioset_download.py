@@ -1,11 +1,7 @@
 # Code Contributor - Ankit Shah - ankit.tronix@gmail.com
 # Modified - Alexander Bakhtin - alexander.bakhtin@tuni.fi
-import time
-import datetime
-import itertools
 import os
 import sys
-import multiprocessing
 from multiprocessing import Pool
 
 # Format audio - 16 bit Signed PCM audio sampled at 44.1kHz
@@ -63,10 +59,8 @@ def download_audio(line, csv_file):
 
 #Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
 #Multiprocessing module spawns 3 process in parallel which runs download_audio_method. Multiprocessing, thus allows downloading process to happen in 40 percent of the time approximately to downloading sequentially - processing line by line of input csv file. 
-def parallelize_download(csv_file, timestamp, num_workers): 
+def parallelize_download(csv_file,num_workers): 
     segments_info_file = open(csv_file, 'r')
-    error_log = 'error' + timestamp + '.log'
-    fo = open(error_log, 'a')
     while True:
         lines_list = []
         last_loop = False
@@ -78,21 +72,15 @@ def parallelize_download(csv_file, timestamp, num_workers):
         P = multiprocessing.Pool(num_workers)
 
         exception = P.starmap(download_audio,lines_list)
-        for item in exception:
-            if item:
-                line = fo.writelines(str(item) +  '\n')
         P.close()
         P.join()
         if last_loop: break
     segments_info_file.close()
-    fo.close()
 
 if __name__ == "__main__":
     if len(sys.argv) !=2:
         print('takes arg1 as csv file to downloaded')
     else:
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y_%m_%d_%H_%M_%S')                   
-        parallelize_download(sys.argv[1],timestamp, 3)
+        parallelize_download(sys.argv[1],3)
         
 
