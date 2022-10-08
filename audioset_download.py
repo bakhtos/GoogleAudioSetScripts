@@ -2,6 +2,7 @@
 # Modified - Alexander Bakhtin - alexander.bakhtin@tuni.fi
 import os
 import sys
+import argparse
 from multiprocessing import Pool
 
 # Format audio - 16 bit Signed PCM audio sampled at 44.1kHz
@@ -75,9 +76,12 @@ def parallelize_download(csv_file,num_workers):
     segments_info_file.close()
 
 if __name__ == "__main__":
-    if len(sys.argv) !=2:
-        print('takes arg1 as csv file to downloaded')
-    else:
-        parallelize_download(sys.argv[1],3)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', type=str, required=True,
+                        help='List of YouTube file-intervals to be downloaded in format YTID_STARTMILLISECONDS, one per line')
+    parser.add_argument('--num_workers', '-n', type=int, default=None,
+                        help='Amount of threads-workers to pass to Pool()')
+    args = parser.parse_args()
+    parallelize_download(args.input,args.num_workers)
         
 
