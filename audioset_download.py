@@ -7,7 +7,7 @@ from multiprocessing import Pool
 
 #Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
 def download_audio(line, dataset_name, clip_length=10000):
-    line = line[:-1]
+
     parts = line.split('_')
     query_id = '_'.join(parts[:-1])
 
@@ -61,7 +61,7 @@ def parallelize_download(input_file,num_workers=None, clip_length=10000):
             last_loop = False
             for i in range(num_workers):
                 line = next(segments_info_file, None)
-                if line is not None: lines_list.append((line, dataset_name, clip_length))
+                if line is not None: lines_list.append((line.removesuffix('\n'), dataset_name, clip_length))
                 last_loop = line is None
         
             with Pool(num_workers) as P:
