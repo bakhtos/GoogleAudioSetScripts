@@ -23,11 +23,8 @@ def trim_audio(input_audio_file,output_audio_file,start_time,duration):
     cmdstring = "sox %s %s trim %s %s" %(input_audio_file,output_audio_file,start_time,duration)
     os.system(cmdstring)
 
-def multi_run_wrapper(args):
-    return download_audio_method(*args)
-
 #Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
-def download_audio_method(line, csv_file):
+def download_audio(line, csv_file):
     line = line[:-1]
     parts = line.split('_')
     query_id = '_'.join(parts[:-1])
@@ -66,32 +63,27 @@ def download_audio_method(line, csv_file):
 
 #Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
 #Multiprocessing module spawns 3 process in parallel which runs download_audio_method. Multiprocessing, thus allows downloading process to happen in 40 percent of the time approximately to downloading sequentially - processing line by line of input csv file. 
-def download_audio(csv_file, timestamp): 
+def parallelize_download(csv_file, timestamp, num_workers): 
     segments_info_file = open(csv_file, 'r')
     error_log = 'error' + timestamp + '.log'
     fo = open(error_log, 'a')
-    #for line in tqdm(segments_info_file):
     while True:
-        line1 = next(segments_info_file, None)
-        line2 = next(segments_info_file, None)
-        line3 = next(segments_info_file, None)
         lines_list = []
-        lines_list.append((line1, csv_file))
-
-        if line2 is not None:
-            lines_list.append((line2, csv_file))
-        if line3 is not None:
-            lines_list.append((line3, csv_file))
+        last_loop = False
+        for i in range(num_workers):
+            line = next(segments_info_file, None)
+            if line is not None: lines_list.append((line, csv_file))
+            last_loop = line is None
         
-        P = multiprocessing.Pool(3)
+        P = multiprocessing.Pool(num_workers)
 
-        exception = P.map(multi_run_wrapper,lines_list)
+        exception = P.starmap(download_audio,lines_list)
         for item in exception:
             if item:
                 line = fo.writelines(str(item) +  '\n')
         P.close()
         P.join()
-        if line2 is None or line3 is None: break
+        if last_loop: break
     segments_info_file.close()
     fo.close()
 
@@ -101,6 +93,6 @@ if __name__ == "__main__":
     else:
         ts = time.time()
         timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y_%m_%d_%H_%M_%S')                   
-        download_audio(sys.argv[1],timestamp)
+        parallelize_download(sys.argv[1],timestamp, 3)
         
 
