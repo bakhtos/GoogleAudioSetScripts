@@ -5,7 +5,7 @@ import sys
 import argparse
 from multiprocessing import Pool
 
-def download_audio(segment_id, dataset_name, clip_length=10000):
+def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=44100, bits=16, channels=1):
 
     parts = segment_id.split('_')
     query_id = '_'.join(parts[:-1])
@@ -36,7 +36,7 @@ def download_audio(segment_id, dataset_name, clip_length=10000):
         if os.path.exists(path_to_formatted_audio):
             print(f"{query_id}: Formatted file already exists.")
         else:
-            cmdstring = f"sox {path_to_download} -G -c 1 -b 16 -r 44100 f{path_to_formatted_audio}"
+            cmdstring = f"sox {path_to_download} -G -c {bits} -b {channels} -r {sample_rate} {path_to_formatted_audio}"
             os.system(cmdstring)
 
         print(f"{query_id}: Trimming...")
@@ -50,7 +50,8 @@ def download_audio(segment_id, dataset_name, clip_length=10000):
         print(f"{query_id}: Error - {str(ex)}")
 
 
-def parallelize_download(input_file,num_workers=None, clip_length=10000):
+def parallelize_download(input_file,num_workers=None, clip_length=10000,
+                         sample_rate=44100, bits=16, channels=1):
     dataset_name = input_file.removesuffix('.txt')
     with open(input_file, 'r) as segments_info_file:
         while True:
@@ -58,7 +59,11 @@ def parallelize_download(input_file,num_workers=None, clip_length=10000):
             last_loop = False
             for i in range(num_workers):
                 line = next(segments_info_file, None)
-                if line is not None: lines_list.append((line.removesuffix('\n'), dataset_name, clip_length))
+                if line is not None: lines_list.append((line.removesuffix('\n'),
+                                                        dataset_name,
+                                                        clip_length,
+                                                        sample_rate,
+                                                        bits, channels))
                 last_loop = line is None
         
             with Pool(num_workers) as P:
@@ -73,5 +78,12 @@ if __name__ == "__main__":
                         help='Amount of threads-workers to pass to Pool()')
     parser.add_argument('--clip_length', type=int, default=10000,
                         help='Length (in ms) of the clip to be extracted from the starting timestamp')
+    parser.add_argument('--sample_rate', '-s', type=int, default=44100,
+                        help="Sample rate (in Hz), passed to the sox -s parameter")
+    parser.add_argument('--bits', '-b', type=int, default=16,
+                        help="Quality of the bitstream, passed to the sox -b parameter")
+    parser.add_argument('--channels', '-c', type=int, default=1,
+                        help="Amount of channels to keep, passed to the sox -c parameter")
     args = parser.parse_args()
-    parallelize_download(args.input,args.num_workers, args.clip_length)
+    parallelize_download(args.input,args.num_workers, args.clip_length,
+                         args.sample_rate, args.bits, args.channels)
