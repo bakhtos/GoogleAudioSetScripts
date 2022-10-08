@@ -53,20 +53,20 @@ def download_audio(line, dataset_name, clip_length=10000):
 
 #Download audio - Reads 3 lines of input csv file at a time and passes them to multi_run wrapper which calls download_audio_method to download the file based on id.
 #Multiprocessing module spawns 3 process in parallel which runs download_audio_method. Multiprocessing, thus allows downloading process to happen in 40 percent of the time approximately to downloading sequentially - processing line by line of input csv file. 
-def parallelize_download(csv_file,num_workers=None, clip_length=10000):
-    segments_info_file = open(csv_file, 'r')
-    while True:
-        lines_list = []
-        last_loop = False
-        for i in range(num_workers):
-            line = next(segments_info_file, None)
-            if line is not None: lines_list.append((line, csv_file, clip_length))
-            last_loop = line is None
+def parallelize_download(input_file,num_workers=None, clip_length=10000):
+    dataset_name = input_file.removesuffix('.txt')
+    with open(input_file, 'r) as segments_info_file:
+        while True:
+            lines_list = []
+            last_loop = False
+            for i in range(num_workers):
+                line = next(segments_info_file, None)
+                if line is not None: lines_list.append((line, dataset_name, clip_length))
+                last_loop = line is None
         
-        with Pool(num_workers) as P:
-            P.starmap(download_audio,lines_list)
-        if last_loop: break
-    segments_info_file.close()
+            with Pool(num_workers) as P:
+                P.starmap(download_audio,lines_list)
+            if last_loop: break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
