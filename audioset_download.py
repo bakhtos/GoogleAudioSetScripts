@@ -6,9 +6,9 @@ import argparse
 from multiprocessing import Pool
 
 #Method to download audio - Downloads the best audio available for audio id, calls the formatting audio function and then segments the audio formatted based on start and end time. 
-def download_audio(line, dataset_name, clip_length=10000):
+def download_audio(segment_id, dataset_name, clip_length=10000):
 
-    parts = line.split('_')
+    parts = segment_id.split('_')
     query_id = '_'.join(parts[:-1])
 
     start_seconds = int(parts[-1])//1000
@@ -23,7 +23,7 @@ def download_audio(line, dataset_name, clip_length=10000):
 
     path_to_download = os.path.join(download_folder, f"Y{query_id}.wav")
     path_to_formatted_audio = os.path.join(formatted_folder, f"Y{query_id}.wav")
-    path_to_segmented_audio = os.path.join(segmented_folder, f"Y{line}.wav")
+    path_to_segmented_audio = os.path.join(segmented_folder, f"Y{segment_id}.wav")
 
     try:
         print(f"{query_id}: Downloading...")
