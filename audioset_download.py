@@ -37,8 +37,7 @@ def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=4410
     query_id = '_'.join(parts[:-1])
 
     start_seconds = int(parts[-1])//1000
-    clip_length = clip_length/1000
-    end_seconds = start_seconds+int(clip_length)
+    clip_length = clip_length//1000
 
     url = "https://www.youtube.com/watch?v=" + query_id
 
@@ -69,7 +68,10 @@ def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=4410
         if os.path.exists(path_to_segmented_audio):
             print(f"{query_id}: Trimmed file already exists.")
         else:
-            cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds} {clip_length}"
+            if clip_length == 0:
+                cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds}"
+            else:
+                cmdstring = f"sox {path_to_formatted_audio} {path_to_segmented_audio} trim {start_seconds} {clip_length}"
             os.system(cmdstring)
 
     except Exception as ex:
