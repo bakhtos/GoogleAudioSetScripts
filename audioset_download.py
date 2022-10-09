@@ -73,9 +73,10 @@ def parallelize_download(input_file,num_workers=None, clip_length=10000,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', type=str, required=True,
-                        help='List of YouTube file-intervals to be downloaded in format YTID_STARTMILLISECONDS, one per line')
+                        help='List of YouTube file-intervals to be downloaded,'
+                        ' in format YTID_STARTTIME, one per line')
     parser.add_argument('--num_workers', '-n', type=int, default=None,
-                        help='Amount of threads-workers to pass to Pool()')
+                        help='Amount of processes/workers to pass to Pool()')
     parser.add_argument('--clip_length', type=int, default=10000,
                         help='Length (in ms) of the clip to be extracted from the starting timestamp')
     parser.add_argument('--sample_rate', '-s', type=int, default=44100,
