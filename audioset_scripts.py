@@ -85,7 +85,7 @@ def filter_by_file(filter_list, data_old, data_new, i):
 
 def select_classes(data, top, output):
     classes = set()
-    top110 = st_ec.most_common(top)
+    top110 = data.most_common(top)
     file = open(output, 'w')
     for c, _ in top110:
         file.write(c+'\n')
