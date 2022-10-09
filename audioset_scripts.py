@@ -2,6 +2,7 @@ import os
 from collections import Counter
 
 def load_labels(file):
+    ''' Load a dictionary from labels ids to label names from specified file.'''
     file = open(file, 'r')
     labels = dict()
     for line in file:
@@ -12,6 +13,21 @@ def load_labels(file):
     return labels
 
 def map_file_and_label(file):
+    ''' Map files and occuring events and vice versa.
+
+    Parameters
+    _________
+
+    file : str, one of the Audioset files (in 'Reformatted' format).
+
+    Returns
+    _______
+
+    file_to_labels : dict[str] -> set[str],
+        Map from files in the dataset to a set of label ids they contain.
+    label_to_file : dict[str -> set[str],
+        Map from label ids to files in the dataset that contain them.
+    '''
     file = open(file, 'r')
     file_to_label = dict()
     label_to_file = dict()
@@ -28,6 +44,20 @@ def map_file_and_label(file):
     return file_to_label, label_to_file
 
 def count_events(file):
+    ''' Count event occurences in the dataset.
+
+    Parameters
+    __________
+
+    file : str, one of the Audioset files (in 'Reformatted' format)
+
+    Returns
+    _______
+
+    event_counts : Counter[str],
+        For each label id gives the total count of events in the specified file. 
+    '''
+
     file = open(file, 'r')
     event_counts = Counter()
     for line in file:
@@ -38,12 +68,14 @@ def count_events(file):
     return event_counts
 
 def dict_to_counter(d):
+    ''' Convert a dict to a counter changing the values into their sizes.'''
     c = Counter()
     for k, v in d.items():
         c[k] = len(v)
     return c
 
 def make_counts_table(file, labels, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec, we_ec):
+    ''' Make a tsv file with counts of files and events for weak and strong, train and eval splits.'''
     file = open(file, 'w')
     file.write("class_id\ttrain_event_count\ttrain_file_count\teval_event_count\teval_file_count\tweak_train_balanced_count\tweak_train_unbalanced_count\tweak_eval_count\n")
     for id_ in labels:
@@ -51,6 +83,7 @@ def make_counts_table(file, labels, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec
     file.close()
 
 def make_top_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_ec, we_ec):
+    ''' Make a tsv table with counts of the 'top' most common classes.'''
     file = open(file, 'w')
     top_classes = st_ec.most_common(top)
     file.write("class_id\ttrain_event_count\ttrain_file_count\teval_event_count\teval_file_count\tweak_train_balanced_count\tweak_train_unbalanced_count\tweak_eval_count\n")
@@ -59,6 +92,7 @@ def make_top_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, wtb_ec, wtu_e
     file.close()
 
 def make_downloaded_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, sttd_ltf, setd_ltf, sttd_ec, setd_ec):
+    ''' Make a tsv table with counts of files and events in the dataset vs actually downloaded files.'''
     file = open(file, 'w')
     top_classes = st_ec.most_common(top)
     file.write("class_id\ttrain_event_count\ttrain_event_count_downloaded\ttrain_file_count\ttrain_file_count_downloaded\teval_event_count\teval_event_count_downloaded\teval_file_count\teval_file_count_downloaded\n")
@@ -67,6 +101,17 @@ def make_downloaded_counts_table(file, top, st_ltf, se_ltf, st_ec, se_ec, sttd_l
     file.close()
 
 def filter_by_file(filter_list, data_old, data_new, i):
+    ''' Only keep lines in the datasets file where a specific column contains one of the specified values.
+
+    Parameters
+    __________
+
+    filter_list : str, file that contains the set of allowed values, one on a line.
+    data_old : str, a dataset file to load (in the 'Reformatted' format').
+    data_new : str, filename to save the filtered dataset into.
+    i : int, dataset's i'th column will be filtered (base-0 indexing).
+    '''
+
     header_set = {'filename', 'event_label', 'onset', 'offset'}
     filter_list = open(filter_list, 'r')
     items = set()
@@ -84,6 +129,21 @@ def filter_by_file(filter_list, data_old, data_new, i):
 
 
 def select_classes(data, top, output):
+    ''' Select the 'top' most common classes by the specified counts.
+
+    Parameters
+    __________
+
+    data : Counter(), counter whose counts are use to deduce most common classes.
+    top : int, this many most common classes are taken.
+    output: str, selected classes are written into this file one on line in 'desceding' order.
+
+    Returns
+    _______
+
+    classes : set, set of the selected classes.
+    '''
+
     classes = set()
     top110 = data.most_common(top)
     file = open(output, 'w')
@@ -94,6 +154,20 @@ def select_classes(data, top, output):
     return classes
 
 def select_files(data, output):
+    ''' Keep only the unique filenames from a dataset file.
+
+    Parameters
+    __________
+
+    data : str, A dataset file to select filenames from (in 'Reformatted' format).
+    output : str, Filenames from 'data' are saved here, one on line.
+
+    Returns
+    _______
+
+    files : set[str], Set of the selected filenames.
+    '''
+
     files = set()
     file = open(data, 'r')
     for line in file:
@@ -109,6 +183,12 @@ def select_files(data, output):
     
 
 if __name__ == '__main__':
+    # Initialize all paths
+    #   a - audioset (common prefix)
+    #   s/w - strong/weak
+    #   e/t/tb/tu - eval/train/train balanced/train unbalanced
+    #   t - top classes
+    #   d - downloaded
     l_path = os.path.join('src','class_labels.tsv')
     ase_path = os.path.join('src','audioset_strong_eval.tsv')
     aset_path = 'audioset_strong_eval_top110classes.tsv'
@@ -123,6 +203,7 @@ if __name__ == '__main__':
     awe_path = os.path.join('src','audioset_weak_eval.tsv')
     asetd_path = 'audioset_strong_eval_top110classes_downloaded.tsv'
 
+    # Load labels and map all datasets
     labels = load_labels(l_path)
     se_ftl, se_ltf = map_file_and_label(ase_path)
     st_ftl, st_ltf = map_file_and_label(ast_path)
@@ -132,6 +213,7 @@ if __name__ == '__main__':
     wtb_ftl, wtb_ltf = map_file_and_label(awtb_path)
     wtu_ftl, wtu_ltf = map_file_and_label(awtu_path)
 
+    # Counts files per labels in datasets
     st_ltf_counter = dict_to_counter(st_ltf)
     se_ltf_counter = dict_to_counter(se_ltf)
     setd_ltf_counter = dict_to_counter(setd_ltf)
@@ -140,13 +222,16 @@ if __name__ == '__main__':
     wtb_ec = dict_to_counter(wtb_ltf)
     wtu_ec = dict_to_counter(wtu_ltf)
 
+    # Count events in strong dataset
     se_ec = count_events(ase_path)
     st_ec = count_events(ast_path)
     setd_ec = count_events(asetd_path)
     sttd_ec = count_events(asttd_path)
 
+    # Select top-110 classes by strong train event count
     select_classes(st_ec, 110, 'selected_classes.txt')
 
+    # Filter strong dataset by top classes, downloaded files, and both
     filter_by_file('selected_classes.txt', ast_path, astt_path, 1)
     filter_by_file('selected_classes.txt', ase_path, aset_path, 1)
     filter_by_file('train_list.txt', ast_path, astd_path, 0)
@@ -154,9 +239,11 @@ if __name__ == '__main__':
     filter_by_file('selected_classes.txt', astd_path, asttd_path, 1)
     filter_by_file('selected_classes.txt', ased_path, asetd_path, 1)
 
+    # List all the files in top-110 to be downloaded
     select_files(astt_path, "selected_files_train.txt")
     select_files(aset_path, 'selected_files_eval.txt')
 
+    # Make counts tables of original dataset, top-110 classes, and top-100 vs downloaded
     make_counts_table('AudioSetClassCounts.tsv', labels, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
                       wtb_ec, wtu_ec, we_ec)
     make_top_counts_table('AudioSetTop110ClassesSortedCounts.tsv', 110, st_ltf_counter, se_ltf_counter, st_ec, se_ec,
