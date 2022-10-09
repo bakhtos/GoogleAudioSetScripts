@@ -53,7 +53,7 @@ def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=4410
 def parallelize_download(input_file,num_workers=None, clip_length=10000,
                          sample_rate=44100, bits=16, channels=1):
     dataset_name = input_file.removesuffix('.txt')
-    with open(input_file, 'r) as segments_info_file:
+    with open(input_file, 'r') as segments_info_file:
         while True:
             lines_list = []
             last_loop = False
