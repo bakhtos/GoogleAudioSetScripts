@@ -23,6 +23,7 @@ def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=4410
     clip_length : int, optional (default 10000)
         Length (in ms) of clip to trim from the STARTTIME specified in input_file.
         NOTE: if the resulting clip is actually shorter, it will NOT be extended by SOX.
+        NOTE: if 0, will trim from STARTTIME until the end.
     sample_rate : int, optional (default 44100)
         Sample rate (in Hz) to resample the downloaded audios into.
         (Passed to sox -s)
@@ -95,6 +96,7 @@ def parallelize_download(input_file,num_workers=None, clip_length=10000,
     clip_length : int, optional (default 10000)
         Length (in ms) of clip to trim from the STARTTIME specified in input_file.
         NOTE: if the resulting clip is actually shorter, it will NOT be extended by SOX.
+        NOTE: if 0, will trim from STARTTIME until the end.
     sample_rate : int, optional (default 44100)
         Sample rate (in Hz) to resample the downloaded audios into.
         (Passed to sox -s)
