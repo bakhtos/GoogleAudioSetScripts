@@ -6,6 +6,32 @@ import argparse
 from multiprocessing import Pool
 
 def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=44100, bits=16, channels=1):
+    ''' Download, reformat and trim audio from YouTube.
+
+    Saves the original downloaded audio in best quality in wav format, 
+    audio formatted in quality (bits, channels, sample rate) specified by user,
+    and audio cut to specified segment.
+
+    Parameters
+    __________
+    segment_id : str
+        A string in the format 'YTID_STARTTIME', where YT_ID is the YouTube ID
+        of the video and STARTTIME is the time stamp (in ms) to trim video from.
+    dataset_name : str
+        Name of the download, used to create download folders: f'{dataset_name}_downloaded',
+        f'{dataset_name}_formatted' and f'{dataset_name}_segmented'.
+    clip_length : int, optional (default 10000)
+        Length (in ms) of clip to trim from the STARTTIME specified in input_file.
+        NOTE: if the resulting clip is actually shorter, it will NOT be extended by SOX.
+    sample_rate : int, optional (default 44100)
+        Sample rate (in Hz) to resample the downloaded audios into.
+        (Passed to sox -s)
+    bits : int, optional (default 16)
+        Quality of audiosteam to convert into. (Passed to sox -b)
+    channels : int, optional (default 1)
+        Number of channels to convert audio into. (Passed to sox -c)
+    '''
+    
 
     parts = segment_id.split('_')
     query_id = '_'.join(parts[:-1])
@@ -52,6 +78,30 @@ def download_audio(segment_id, dataset_name, clip_length=10000, sample_rate=4410
 
 def parallelize_download(input_file,num_workers=None, clip_length=10000,
                          sample_rate=44100, bits=16, channels=1):
+    ''' Parallelize the task of downloading data from YouTube.
+
+    Parameters
+    __________
+    input_file : str
+        A text file (with or without '.txt' suffix, which one video to download
+        on each line in the format 'YTID_STARTTIME', where YT_ID is the YouTube ID
+        of the video and STARTTIME is the time stamp (in ms) to trim video from.
+        NOTE: the input file will be openned by Python for the whole execution
+        of the program.
+    num_workers : int, optional (default None)
+        Amount of processes (downloads) to spawn using Pool().
+    clip_length : int, optional (default 10000)
+        Length (in ms) of clip to trim from the STARTTIME specified in input_file.
+        NOTE: if the resulting clip is actually shorter, it will NOT be extended by SOX.
+    sample_rate : int, optional (default 44100)
+        Sample rate (in Hz) to resample the downloaded audios into.
+        (Passed to sox -s)
+    bits : int, optional (default 16)
+        Quality of audiosteam to convert into. (Passed to sox -b)
+    channels : int, optional (default 1)
+        Number of channels to convert audio into. (Passed to sox -c)
+    '''
+    
     dataset_name = input_file.removesuffix('.txt')
     with open(input_file, 'r') as segments_info_file:
         while True:
