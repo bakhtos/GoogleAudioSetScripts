@@ -86,10 +86,10 @@ def parallelize_download(input_file,num_workers=None, clip_length=10000,
     Parameters
     __________
     input_file : str
-        A text file (with or without '.txt' suffix, which one video to download
-        on each line in the format 'YTID_STARTTIME', where YT_ID is the YouTube ID
+        A text file (with or without '.txt' suffix), with one video to download
+        on each line in the format 'YTID_STARTTIME', where YTID is the YouTube ID
         of the video and STARTTIME is the time stamp (in ms) to trim video from.
-        NOTE: the input file will be openned by Python for the whole execution
+        NOTE: the input file will be open in Python for the whole execution
         of the program.
     num_workers : int, optional (default None)
         Amount of processes (downloads) to spawn using Pool().
